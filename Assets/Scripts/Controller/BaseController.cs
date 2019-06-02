@@ -11,12 +11,12 @@ namespace Ig.Controller
             On(null);
         }
 
-        public virtual void On(BaseModel baseModel)
+        protected virtual void On(BaseModel baseModel)
         {
             Enabled = true;
         }
 
-        public virtual void Off()
+        protected virtual void Off()
         {
             Enabled = false;
         }

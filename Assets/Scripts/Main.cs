@@ -1,42 +1,43 @@
-using System;
 using System.Collections.Generic;
 using Ig.Controller;
-using Ig.Helper;
+using Ig.Helpers;
 using Ig.Interface;
 using Ig.Model;
 using UnityEngine;
-using UnityStandardAssets.Characters.ThirdPerson;
 
 namespace Ig
 {
     public class Main : MonoBehaviour
     {
-        [SerializeField] public PointModel BasePoint;
+        [SerializeField] public Transform Spawn;
+        [SerializeField] public BotModel BotModel;
+        public PoolObject<BotModel> Bots { get; private set; }
 
-        public PointController PointController { get; private set; }
-        public PoolObject<PointModel> PoolObject;
-        
         public static Main Instance { get; private set; }
 
         private readonly List<IUpdate> _updates = new List<IUpdate>();
-        private AiController _aiController { get; set; }
-        
+        private PlayerController _aiController;
+        private BotController _botController;
+        private CameraController _cameraController;
+
         private void Awake()
         {
             Instance = this;
-            var character = FindObjectOfType(typeof(AICharacterControl)) as AICharacterControl;
-            
-            _aiController = new AiController(character);
-            PointController = new PointController();
-            PoolObject = new PoolObject<PointModel>(() => Instantiate(BasePoint, BasePoint.Position, BasePoint.Rotation));
-            
-            _updates.AddRange(new IUpdate[]{PointController, _aiController});
+
+            _aiController = new PlayerController();
+            _botController = new BotController();
+            _cameraController = new CameraController();
+            Bots = new PoolObject<BotModel>(Spawn.position,
+                () => Instantiate(BotModel, Helper.GenericPoint(Spawn), Quaternion.identity));
+
+            _updates.AddRange(new IUpdate[] {_aiController, _botController, _cameraController});
         }
 
         private void Start()
         {
-            PointController.On();
             _aiController.On();
+            _botController.On();
+            _cameraController.On();
         }
 
         private void Update()
