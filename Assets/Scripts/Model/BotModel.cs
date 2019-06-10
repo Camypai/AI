@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace Ig.Model
 {
-    public class BotModel : BaseModel, ISetDamage
+    public class BotModel : BaseModel, ISetDamage, ISetHealth
     {
         public BotState _state = BotState.Empty;
         private float _hp = 100;
@@ -67,7 +67,7 @@ namespace Ig.Model
                     _navMeshAgent.stoppingDistance = 6;
                     _weaponModel.Fire();
                     break;
-                case BotState.Lose:
+                case BotState.Repeat:
                     _navMeshAgent.SetDestination(point);
                     _navMeshAgent.stoppingDistance = 1;
                     _state = BotState.Patrol;
@@ -85,7 +85,7 @@ namespace Ig.Model
             }
             else if (_state == BotState.Aggression)
             {
-                _state = BotState.Lose;
+                _state = BotState.Repeat;
             }
         }
 
@@ -104,7 +104,15 @@ namespace Ig.Model
 
         private void ReadyPatrol()
         {
-            _state = BotState.Patrol;
+            _state = BotState.Repeat;
+        }
+
+        public void SetHealth(float health)
+        {
+            if (_hp < 100)
+            {
+                _hp += health;
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Ig.Enum
         Patrol,
         Observation,
         Aggression,
-        Lose,
+        Repeat,
         Death
     }
 }
