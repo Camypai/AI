@@ -6,6 +6,8 @@ namespace Ig.Model
 {
     public class PlayerModel : BaseModel
     {
+        public int Id = 0;
+        
         private NavMeshAgent _navMeshAgent;
 
         private WeaponModel _weaponModel;
