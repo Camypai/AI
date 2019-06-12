@@ -19,10 +19,12 @@ namespace Ig.Controller
         private Vector3 _targetPosition;
         private GameObject _target;
         private PlayerState _state = PlayerState.Idle;
+        private IRepository<PlayerSave> _db;
 
         public PlayerController()
         {
             _character = Object.FindObjectOfType<PlayerModel>();
+            _db = new JsonPlayerSaveRepository(@"./Assets/Scripts/Db/save.json");
         }
 
         public void Update()
@@ -53,22 +55,14 @@ namespace Ig.Controller
             {
                 if (CheckSaveExist(out var model))
                 {
-                    using (var db = new SqlitePlayerSaveRepository())
-                    {
-                        
-                    db.Update(_character);
-                    }
+                    _db.Update(_character);
                 }
                 else
                 {
-                    using (var db = new SqlitePlayerSaveRepository())
-                    {
-                        
-                        db.Create(_character);
-                    }
+                    _db.Create(_character);
                 }
             }
-            
+
             if (Input.GetKeyUp(KeyCode.F6))
             {
                 if (CheckSaveExist(out var model))
@@ -93,14 +87,12 @@ namespace Ig.Controller
 
         private bool CheckSaveExist(out PlayerSave model)
         {
-            using (var db = new SqlitePlayerSaveRepository())
+            if (_db.CheckExist())
             {
-                if (db.CheckExist())
-                {
-                    model = db.Retrieve(_character.Id);
-                    return true;
-                }
+                model = _db.Retrieve(_character.Id);
+                return true;
             }
+
             model = null;
             return false;
         }
