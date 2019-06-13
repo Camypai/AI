@@ -12,6 +12,7 @@ namespace Ig
         [SerializeField] public Transform Spawn;
         [SerializeField] public BotModel BotModel;
         public PoolObject<BotModel> Bots { get; private set; }
+//        public SqlitePlayerSaveRepository Db;
 
         public static Main Instance { get; private set; }
 
@@ -23,6 +24,8 @@ namespace Ig
         private void Awake()
         {
             Instance = this;
+            
+//            Db = new SqlitePlayerSaveRepository();
 
             _aiController = new PlayerController();
             _botController = new BotController();

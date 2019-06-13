@@ -1,10 +1,14 @@
 using System;
+using System.Data.SQLite;
 using Ig.Enum;
+using Ig.Helpers;
+using Ig.Helpers.Db;
 using Ig.Interface;
 using Ig.Model;
 using UnityEngine;
 using UnityStandardAssets.Characters.ThirdPerson;
 using Object = UnityEngine.Object;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Ig.Controller
 {
@@ -15,10 +19,12 @@ namespace Ig.Controller
         private Vector3 _targetPosition;
         private GameObject _target;
         private PlayerState _state = PlayerState.Idle;
+        private IRepository<PlayerSave> _db;
 
         public PlayerController()
         {
             _character = Object.FindObjectOfType<PlayerModel>();
+            _db = new JsonPlayerSaveRepository(@"./Assets/Scripts/Db/save.json");
         }
 
         public void Update()
@@ -45,6 +51,27 @@ namespace Ig.Controller
                 }
             }
 
+            if (Input.GetKeyUp(KeyCode.F5))
+            {
+                if (CheckSaveExist(out var model))
+                {
+                    _db.Update(_character);
+                }
+                else
+                {
+                    _db.Create(_character);
+                }
+            }
+
+            if (Input.GetKeyUp(KeyCode.F6))
+            {
+                if (CheckSaveExist(out var model))
+                {
+                    _character.Position = model.Position;
+                    _character.Rotation = model.Rotate;
+                }
+            }
+
             switch (_state)
             {
                 case PlayerState.Idle:
@@ -56,6 +83,18 @@ namespace Ig.Controller
                     _character.Attack(_target.transform.position);
                     break;
             }
+        }
+
+        private bool CheckSaveExist(out PlayerSave model)
+        {
+            if (_db.CheckExist())
+            {
+                model = _db.Retrieve(_character.Id);
+                return true;
+            }
+
+            model = null;
+            return false;
         }
     }
 }
